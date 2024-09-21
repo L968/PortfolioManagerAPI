@@ -35,21 +35,21 @@ public class GetInvestmentProductStatementTests
                 Id = 1,
                 UserId = userId,
                 InvestmentProductId = 1,
+                InvestmentProductName = "Product A",
                 Date = DateTime.UtcNow,
                 Price = 100m,
                 Quantity = 2,
                 Type = TransactionType.Buy,
-                InvestmentProduct = new() { Id = 1, Name = "Product A" }
             },
             new() {
                 Id = 2,
                 UserId = userId,
                 InvestmentProductId = 2,
+                InvestmentProductName = "Product B",
                 Date = DateTime.UtcNow,
                 Price = 200m,
                 Quantity = 1,
                 Type = TransactionType.Sell,
-                InvestmentProduct = new() { Id = 2, Name = "Product B" }
             }
         };
 

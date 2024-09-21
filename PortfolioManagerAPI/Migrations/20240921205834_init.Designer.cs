@@ -12,7 +12,7 @@ using PortfolioManagerAPI.Infrastructure;
 namespace PortfolioManagerAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240921194246_init")]
+    [Migration("20240921205834_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -66,6 +66,10 @@ namespace PortfolioManagerAPI.Migrations
                     b.Property<int>("InvestmentProductId")
                         .HasColumnType("int");
 
+                    b.Property<string>("InvestmentProductName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(65, 2)
                         .HasColumnType("decimal(65,2)");
@@ -80,8 +84,6 @@ namespace PortfolioManagerAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InvestmentProductId");
 
                     b.ToTable("Transactions");
                 });
@@ -143,33 +145,15 @@ namespace PortfolioManagerAPI.Migrations
                     b.ToTable("UserProducts");
                 });
 
-            modelBuilder.Entity("PortfolioManagerAPI.Entities.Transaction", b =>
-                {
-                    b.HasOne("PortfolioManagerAPI.Entities.InvestmentProduct", "InvestmentProduct")
-                        .WithMany("Transactions")
-                        .HasForeignKey("InvestmentProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("InvestmentProduct");
-                });
-
             modelBuilder.Entity("PortfolioManagerAPI.Entities.UserProduct", b =>
                 {
                     b.HasOne("PortfolioManagerAPI.Entities.InvestmentProduct", "InvestmentProduct")
-                        .WithMany("UserProducts")
+                        .WithMany()
                         .HasForeignKey("InvestmentProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("InvestmentProduct");
-                });
-
-            modelBuilder.Entity("PortfolioManagerAPI.Entities.InvestmentProduct", b =>
-                {
-                    b.Navigation("Transactions");
-
-                    b.Navigation("UserProducts");
                 });
 #pragma warning restore 612, 618
         }

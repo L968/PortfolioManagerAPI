@@ -42,6 +42,7 @@ internal sealed class SellInvestmentProductHandler(
         {
             UserId = request.UserId,
             InvestmentProductId = request.InvestmentProductId,
+            InvestmentProductName = investmentProduct.Name,
             Date = DateTime.UtcNow,
             Price = investmentProduct.Price,
             Quantity = request.Quantity,
@@ -72,7 +73,6 @@ internal sealed class SellInvestmentProductHandler(
         return new SellInvestmentProductResponse
         {
             TransactionId = transaction.Id,
-            UserId = request.UserId,
             InvestmentProductId = request.InvestmentProductId,
             Quantity = request.Quantity,
             Price = investmentProduct.Price

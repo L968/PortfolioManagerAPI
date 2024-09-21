@@ -7,7 +7,4 @@ public class InvestmentProduct
     public InvestmentProductType Type { get; set; }
     public decimal Price { get; set; }
     public DateTime ExpirationDate { get; set; }
-
-    public List<Transaction> Transactions { get; set; } = [];
-    public List<UserProduct> UserProducts { get; set; } = [];
 }

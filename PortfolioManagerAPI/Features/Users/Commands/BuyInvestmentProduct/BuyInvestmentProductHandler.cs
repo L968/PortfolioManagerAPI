@@ -28,6 +28,7 @@ internal sealed class BuyInvestmentProductHandler(
         {
             UserId = request.UserId,
             InvestmentProductId = request.InvestmentProductId,
+            InvestmentProductName = investmentProduct.Name,
             Date = DateTime.UtcNow,
             Price = investmentProduct.Price,
             Quantity = request.Quantity,
@@ -74,7 +75,6 @@ internal sealed class BuyInvestmentProductHandler(
         return new BuyInvestmentProductResponse
         {
             TransactionId = newTransaction.Id,
-            UserId = request.UserId,
             InvestmentProductId = request.InvestmentProductId,
             Quantity = request.Quantity,
             Price = investmentProduct.Price

@@ -2,7 +2,8 @@ services:
   portfoliomanager.api:
     image: ${DOCKER_REGISTRY-}portfoliomanager.api
     container_name: portfoliomanager.api
-    restart: unless-stopped
+    restart: "no"
+    command: ["sleep", "infinity"]
     build:
       context: .
       dockerfile: PortfolioManagerAPI/Dockerfile

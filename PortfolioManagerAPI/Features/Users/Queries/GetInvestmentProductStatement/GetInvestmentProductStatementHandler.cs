@@ -27,7 +27,6 @@ internal sealed class GetInvestmentProductStatementHandler(
 
         var transactions = await _context.Transactions
             .Where(t => t.UserId == request.UserId)
-            .Include(t => t.InvestmentProduct)
             .ToListAsync(cancellationToken);
 
         if (transactions.Count == 0)
@@ -40,7 +39,7 @@ internal sealed class GetInvestmentProductStatementHandler(
         {
             TransactionId = transaction.Id,
             InvestmentProductId = transaction.InvestmentProductId,
-            InvestmentProductName = transaction.InvestmentProduct.Name,
+            InvestmentProductName = transaction.InvestmentProductName,
             Date = transaction.Date,
             Price = transaction.Price,
             Quantity = transaction.Quantity,
