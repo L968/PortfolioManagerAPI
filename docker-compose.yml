@@ -1,0 +1,50 @@
+services:
+  portfoliomanager.api:
+    image: ${DOCKER_REGISTRY-}portfoliomanager.api
+    container_name: portfoliomanager.api
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: PortfolioManagerAPI/Dockerfile
+    ports:
+      - 7202:8080
+    networks:
+      - portfoliomanager-bridge
+
+  portfoliomanager.mysql:
+    image: mysql:8.4.0
+    container_name: portfoliomanager.mysql
+    restart: unless-stopped
+    networks:
+      - portfoliomanager-bridge
+    environment:
+      MYSQL_DATABASE: portfoliomanager
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      retries: 5
+      interval: 5s
+      timeout: 30s
+
+  portfoliomanager.redis:
+    image: redis:7.4
+    container_name: portfoliomanager.redis
+    restart: unless-stopped
+    networks:
+      - portfoliomanager-bridge
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  portfoliomanager-bridge:
+    driver: bridge
