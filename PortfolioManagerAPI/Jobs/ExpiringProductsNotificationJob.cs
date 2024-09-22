@@ -1,5 +1,5 @@
 ﻿using PortfolioManagerAPI.Infrastructure;
-using PortfolioManagerAPI.Services;
+using PortfolioManagerAPI.Infrastructure.Services;
 
 namespace PortfolioManagerAPI.Jobs;
 

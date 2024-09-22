@@ -2,7 +2,7 @@
 using MimeKit;
 using PortfolioManagerAPI.Domain;
 
-namespace PortfolioManagerAPI.Services;
+namespace PortfolioManagerAPI.Infrastructure.Services;
 
 public class EmailService : IEmailService
 {

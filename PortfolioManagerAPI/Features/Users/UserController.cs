@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PortfolioManagerAPI.Enums;
+using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Features.Users.Commands.BuyInvestmentProduct;
 using PortfolioManagerAPI.Features.Users.Commands.SellInvestmentProduct;
 using PortfolioManagerAPI.Features.Users.Queries.GetInvestmentProductStatement;
 using PortfolioManagerAPI.Features.Users.Queries.GetInvestmentProductSummary;
-using PortfolioManagerAPI.Services;
+using PortfolioManagerAPI.Infrastructure.Services;
 using System.Security.Claims;
 
 namespace PortfolioManagerAPI.Features.Users;

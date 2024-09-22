@@ -20,7 +20,6 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
         httpContext.Response.ContentType = "application/json";
-
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
         return true;
@@ -28,20 +27,19 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
 
     private static ProblemDetails CreateProblemDetails(Exception exception)
     {
-        if (exception is AppException appException)
+        return exception switch
         {
-            return new ProblemDetails
+            AppException appException => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Bad Request",
                 Detail = appException.Message
-            };
-        }
-
-        return new ProblemDetails
-        {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Internal Server Error"
+            },
+            _ => new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "Internal Server Error"
+            }
         };
     }
 
@@ -49,21 +47,25 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
     {
         string baseMessage = "Status Code: {StatusCode}, TraceId: {TraceId}, Message: {Message}";
 
-        switch (statusCode)
+        if (statusCode == StatusCodes.Status400BadRequest)
         {
-            case StatusCodes.Status400BadRequest:
-                _logger.LogWarning(baseMessage + ", Validation warning occurred", statusCode, traceId, exception.Message);
-                break;
-            default:
-                _logger.LogError(
-                    exception: exception,
-                    message: baseMessage + ", Error processing request on machine {MachineName}",
-                    statusCode,
-                    traceId,
-                    exception.Message,
-                    Environment.MachineName
-                );
-                break;
+            _logger.LogWarning(
+                $"{baseMessage}, Validation warning occurred",
+                statusCode,
+                traceId,
+                exception.Message
+            );
+        }
+        else
+        {
+            _logger.LogError(
+                exception,
+                baseMessage + ", Error processing request on machine {MachineName}",
+                statusCode,
+                traceId,
+                exception.Message,
+                Environment.MachineName
+            );
         }
     }
 }

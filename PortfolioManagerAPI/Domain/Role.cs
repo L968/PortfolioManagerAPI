@@ -1,4 +1,4 @@
-﻿namespace PortfolioManagerAPI.Enums;
+﻿namespace PortfolioManagerAPI.Domain;
 
 public enum Role
 {

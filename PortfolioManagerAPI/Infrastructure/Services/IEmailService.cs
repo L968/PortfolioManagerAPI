@@ -1,6 +1,6 @@
 ﻿using PortfolioManagerAPI.Domain;
 
-namespace PortfolioManagerAPI.Services;
+namespace PortfolioManagerAPI.Infrastructure.Services;
 
 public interface IEmailService
 {

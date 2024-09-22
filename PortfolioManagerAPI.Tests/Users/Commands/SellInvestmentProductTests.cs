@@ -4,8 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.EntityFrameworkCore;
 using PortfolioManagerAPI.Domain;
-using PortfolioManagerAPI.Entities;
-using PortfolioManagerAPI.Enums;
 using PortfolioManagerAPI.Exceptions;
 using PortfolioManagerAPI.Features.Users.Commands.SellInvestmentProduct;
 using PortfolioManagerAPI.Infrastructure;

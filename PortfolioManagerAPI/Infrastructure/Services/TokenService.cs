@@ -1,10 +1,10 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using PortfolioManagerAPI.Enums;
+using PortfolioManagerAPI.Domain;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace PortfolioManagerAPI.Services;
+namespace PortfolioManagerAPI.Infrastructure.Services;
 
 public class TokenService(IConfiguration configuration) : ITokenService
 {
