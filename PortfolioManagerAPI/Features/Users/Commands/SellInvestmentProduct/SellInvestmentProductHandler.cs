@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
-using PortfolioManagerAPI.Entities;
+using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Infrastructure;
 
 namespace PortfolioManagerAPI.Features.Users.Commands.SellInvestmentProduct;

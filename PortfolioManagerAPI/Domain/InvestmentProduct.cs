@@ -1,4 +1,4 @@
-﻿namespace PortfolioManagerAPI.Entities;
+﻿namespace PortfolioManagerAPI.Domain;
 
 public class InvestmentProduct
 {

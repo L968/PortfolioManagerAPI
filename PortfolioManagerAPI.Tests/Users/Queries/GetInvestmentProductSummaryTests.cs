@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.EntityFrameworkCore;
-using PortfolioManagerAPI.Entities;
+using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Features.Users.Queries.GetInvestmentProductSummary;
 using PortfolioManagerAPI.Infrastructure;
 

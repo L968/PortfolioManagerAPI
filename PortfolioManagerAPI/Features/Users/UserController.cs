@@ -8,7 +8,7 @@ using PortfolioManagerAPI.Features.Users.Queries.GetInvestmentProductSummary;
 using PortfolioManagerAPI.Services;
 using System.Security.Claims;
 
-namespace PortfolioManagerAPI.Controllers;
+namespace PortfolioManagerAPI.Features.Users;
 
 [ApiController]
 [Route("[controller]")]

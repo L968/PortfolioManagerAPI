@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Entities;
+using PortfolioManagerAPI.Enums;
 using PortfolioManagerAPI.Infrastructure;
 
 namespace PortfolioManagerAPI.Features.Users.Commands.BuyInvestmentProduct;

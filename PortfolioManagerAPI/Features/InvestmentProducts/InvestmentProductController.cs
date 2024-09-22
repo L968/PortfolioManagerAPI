@@ -6,7 +6,7 @@ using PortfolioManagerAPI.Features.InvestmentProducts.Commands.UpdateInvestmentP
 using PortfolioManagerAPI.Features.InvestmentProducts.Queries.GetInvestmentProductById;
 using PortfolioManagerAPI.Features.InvestmentProducts.Queries.GetInvestmentProducts;
 
-namespace PortfolioManagerAPI.Controllers;
+namespace PortfolioManagerAPI.Features.InvestmentProducts;
 
 [ApiController]
 [Route("[controller]")]

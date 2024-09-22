@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.EntityFrameworkCore;
-using PortfolioManagerAPI.Entities;
+using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Exceptions;
 using PortfolioManagerAPI.Features.InvestmentProducts.Commands.CreateInvestmentProduct;
 using PortfolioManagerAPI.Infrastructure;

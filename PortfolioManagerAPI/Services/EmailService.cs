@@ -1,6 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
-using PortfolioManagerAPI.Entities;
+using PortfolioManagerAPI.Domain;
 
 namespace PortfolioManagerAPI.Services;
 

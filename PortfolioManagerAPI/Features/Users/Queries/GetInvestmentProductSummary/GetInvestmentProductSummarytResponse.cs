@@ -1,4 +1,4 @@
-﻿using PortfolioManagerAPI.Entities;
+﻿using PortfolioManagerAPI.Domain;
 
 namespace PortfolioManagerAPI.Features.Users.Queries.GetInvestmentProductSummary;
 

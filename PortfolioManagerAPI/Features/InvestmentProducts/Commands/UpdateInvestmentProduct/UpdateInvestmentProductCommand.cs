@@ -1,4 +1,4 @@
-﻿using PortfolioManagerAPI.Entities;
+﻿using PortfolioManagerAPI.Domain;
 using System.Text.Json.Serialization;
 
 namespace PortfolioManagerAPI.Features.InvestmentProducts.Commands.UpdateInvestmentProduct;
