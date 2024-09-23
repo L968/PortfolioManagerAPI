@@ -5,6 +5,7 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
+using PortfolioManagerAPI.Behaviours;
 using PortfolioManagerAPI.Handlers;
 using PortfolioManagerAPI.Infrastructure;
 using PortfolioManagerAPI.Infrastructure.Services;
@@ -26,9 +27,14 @@ builder.Services
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(assembly));
+
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssembly(assembly);
+    config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+});
+
 builder.Services.AddValidatorsFromAssembly(assembly);
 builder.Services.AddFluentValidationAutoValidation();
 ValidatorOptions.Global.LanguageManager.Culture = CultureInfo.InvariantCulture;
@@ -40,13 +46,13 @@ var connectionString = builder.Configuration.GetConnectionString("Database");
 var serverVersion = ServerVersion.AutoDetect(connectionString);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-            options
-                .UseMySql(
-                    connectionString,
-                    serverVersion,
-                    mysqlOptions => mysqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
-                )
-        );
+    options
+        .UseMySql(
+            connectionString,
+            serverVersion,
+            mysqlOptions => mysqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
+        )
+);
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -95,7 +101,8 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<AppDbContext>();
+    .AddDbContextCheck<AppDbContext>()
+    .AddRedis(builder.Configuration.GetConnectionString("Redis")!);
 
 var app = builder.Build();
 
