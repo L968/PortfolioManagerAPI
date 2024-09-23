@@ -1,0 +1,367 @@
+{
+	"info": {
+		"_postman_id": "f7d2c89a-e5e3-4e0b-b419-cd57d525e665",
+		"name": "PortfolioManagerAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10416779"
+	},
+	"item": [
+		{
+			"name": "InvestmentProduct",
+			"item": [
+				{
+					"name": "{id}",
+					"item": [
+						{
+							"name": "/InvestmentProduct/:id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/InvestmentProduct/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"InvestmentProduct",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/InvestmentProduct/:id",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"PETR4\",\n  \"type\": \"Stock\",\n  \"price\": 200,\n  \"expirationDate\": \"2025-01-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/InvestmentProduct/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"InvestmentProduct",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/InvestmentProduct/:id",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/InvestmentProduct/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"InvestmentProduct",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "/InvestmentProduct",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/InvestmentProduct",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"InvestmentProduct"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/InvestmentProduct",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"PETR4\",\n  \"type\": \"Stock\",\n  \"price\": 100.00,\n  \"expirationDate\": \"2024-09-29T00:00:00.000Z\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/InvestmentProduct",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"InvestmentProduct"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "/User/generateToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(pm.response.text());\r",
+									"pm.collectionVariables.set(\"Token\", jsonData.token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/User/generateToken?role=regular",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"User",
+								"generateToken"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "role",
+									"value": "regular"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/User/statement",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/User/statement",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"User",
+								"statement"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/User/summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/User/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"User",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/User/buy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"investmentProductId\": \"1\",\n  \"quantity\": \"10\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/User/buy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"User",
+								"buy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/User/sell",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"investmentProductId\": \"1\",\n  \"quantity\": \"2\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/User/sell",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"User",
+								"sell"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{Token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:7202"
+		},
+		{
+			"key": "Token",
+			"value": ""
+		}
+	]
+}
