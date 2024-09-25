@@ -1,32 +1,36 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Infrastructure;
+using PortfolioManagerAPI.Infrastructure.Repositories.Interfaces;
 
 namespace PortfolioManagerAPI.Features.Users.Commands.SellInvestmentProduct;
 
 internal sealed class SellInvestmentProductHandler(
-    AppDbContext context,
+    IInvestmentProductRepository investmentProductRepository,
+    ITransactionRepository transactionRepository,
+    IUserProductRepository userProductRepository,
+    IUnitOfWork unitOfWork,
     IDistributedCache cache,
     ILogger<SellInvestmentProductHandler> logger
 ) : IRequestHandler<SellInvestmentProductCommand, SellInvestmentProductResponse>
 {
-    private readonly AppDbContext _context = context;
+    private readonly IInvestmentProductRepository _investmentProductRepository = investmentProductRepository;
+    private readonly ITransactionRepository _transactionRepository = transactionRepository;
+    private readonly IUserProductRepository _userProductRepository = userProductRepository;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IDistributedCache _cache = cache;
     private readonly ILogger<SellInvestmentProductHandler> _logger = logger;
 
     public async Task<SellInvestmentProductResponse> Handle(SellInvestmentProductCommand request, CancellationToken cancellationToken)
     {
-        var investmentProduct = await _context.InvestmentProducts
-            .FirstOrDefaultAsync(p => p.Id == request.InvestmentProductId, cancellationToken);
+        var investmentProduct = await _investmentProductRepository.GetByIdAsync(request.InvestmentProductId, cancellationToken);
 
         if (investmentProduct is null)
         {
             throw new AppException($"Investment product with Id {request.InvestmentProductId} not found.");
         }
 
-        var userProduct = await _context.UserProducts
-            .FirstOrDefaultAsync(up => up.UserId == request.UserId
-                                    && up.InvestmentProductId == request.InvestmentProductId, cancellationToken);
+        var userProduct = await _userProductRepository.GetUserProductAsync(request.UserId, request.InvestmentProductId, cancellationToken);
 
         if (userProduct is null)
         {
@@ -38,7 +42,7 @@ internal sealed class SellInvestmentProductHandler(
             throw new AppException($"User {request.UserId} does not have enough quantity to sell. Available: {userProduct.Quantity}, Requested: {request.Quantity}.");
         }
 
-        var transaction = new Transaction
+        var newTransaction = new Transaction
         {
             UserId = request.UserId,
             InvestmentProductId = request.InvestmentProductId,
@@ -49,20 +53,20 @@ internal sealed class SellInvestmentProductHandler(
             Type = TransactionType.Sell
         };
 
-        _context.Transactions.Add(transaction);
+        _transactionRepository.Create(newTransaction);
 
         userProduct.Quantity -= request.Quantity;
 
         if (userProduct.Quantity == 0)
         {
-            _context.UserProducts.Remove(userProduct);
+            _userProductRepository.Delete(userProduct);
         }
         else
         {
-            _context.UserProducts.Update(userProduct);
+            _userProductRepository.Update(userProduct);
         }
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         string cacheKey = CacheKeys.InvestmentProductStatement(request.UserId);
         await _cache.RemoveAsync(cacheKey, cancellationToken);
@@ -72,7 +76,7 @@ internal sealed class SellInvestmentProductHandler(
 
         return new SellInvestmentProductResponse
         {
-            TransactionId = transaction.Id,
+            TransactionId = newTransaction.Id,
             InvestmentProductId = request.InvestmentProductId,
             Quantity = request.Quantity,
             Price = investmentProduct.Price

@@ -1,23 +1,25 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Infrastructure;
+using PortfolioManagerAPI.Infrastructure.Repositories.Interfaces;
 
 namespace PortfolioManagerAPI.Features.InvestmentProducts.Commands.CreateInvestmentProduct;
 
 internal sealed class CreateInvestmentProductHandler(
-    AppDbContext context,
+    IInvestmentProductRepository repository,
+    IUnitOfWork unitOfWork,
     IDistributedCache cache,
     ILogger<CreateInvestmentProductHandler> logger
     ) : IRequestHandler<CreateInvestmentProductCommand, CreateInvestmentProductResponse>
 {
-    private readonly AppDbContext _context = context;
+    private readonly IInvestmentProductRepository _repository = repository;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IDistributedCache _cache = cache;
     private readonly ILogger<CreateInvestmentProductHandler> _logger = logger;
 
     public async Task<CreateInvestmentProductResponse> Handle(CreateInvestmentProductCommand request, CancellationToken cancellationToken)
     {
-        InvestmentProduct? existingInvestmentProduct = await _context.InvestmentProducts
-            .FirstOrDefaultAsync(p => p.Name == request.Name, cancellationToken);
+        InvestmentProduct? existingInvestmentProduct = await _repository.GetByNameAsync(request.Name, cancellationToken);
 
         if (existingInvestmentProduct is not null)
         {
@@ -32,8 +34,8 @@ internal sealed class CreateInvestmentProductHandler(
             ExpirationDate = request.ExpirationDate,
         };
 
-        _context.InvestmentProducts.Add(investmentProduct);
-        await _context.SaveChangesAsync(cancellationToken);
+        _repository.Create(investmentProduct);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         await _cache.RemoveAsync(CacheKeys.InvestmentProducts, cancellationToken);
 
         _logger.LogInformation("Successfully create {@InvestmentProduct}", investmentProduct);

@@ -1,28 +1,30 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Moq.EntityFrameworkCore;
 using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Exceptions;
 using PortfolioManagerAPI.Features.InvestmentProducts.Queries.GetInvestmentProductById;
-using PortfolioManagerAPI.Infrastructure;
+using PortfolioManagerAPI.Infrastructure.Repositories.Interfaces;
 
 namespace PortfolioManagerAPI.Tests.InvestmentProducts.Queries;
 
 public class GetInvestmentProductByIdTests
 {
+    private readonly Mock<IInvestmentProductRepository> _repositoryMock;
     private readonly Mock<ILogger<GetInvestmentProductByIdHandler>> _loggerMock;
-    private readonly Mock<AppDbContext> _contextMock;
-    private readonly Mock<DbSet<InvestmentProduct>> _dbSetMock;
     private readonly GetInvestmentProductByIdHandler _handler;
 
     public GetInvestmentProductByIdTests()
     {
+        _repositoryMock = new Mock<IInvestmentProductRepository>();
         _loggerMock = new Mock<ILogger<GetInvestmentProductByIdHandler>>();
 
-        _contextMock = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
-        _dbSetMock = new Mock<DbSet<InvestmentProduct>>();
+        _handler = new GetInvestmentProductByIdHandler(_repositoryMock.Object, _loggerMock.Object);
+    }
 
+    [Fact]
+    public async Task ShouldReturnInvestmentProduct_WhenProductExists()
+    {
+        // Arrange
         var investmentProduct = new InvestmentProduct
         {
             Id = 1,
@@ -32,21 +34,9 @@ public class GetInvestmentProductByIdTests
             ExpirationDate = new DateTime(2025, 1, 1)
         };
 
-        var data = new List<InvestmentProduct> { investmentProduct }.AsQueryable();
-        _dbSetMock.As<IQueryable<InvestmentProduct>>().Setup(m => m.Provider).Returns(data.Provider);
-        _dbSetMock.As<IQueryable<InvestmentProduct>>().Setup(m => m.Expression).Returns(data.Expression);
-        _dbSetMock.As<IQueryable<InvestmentProduct>>().Setup(m => m.ElementType).Returns(data.ElementType);
-        _dbSetMock.As<IQueryable<InvestmentProduct>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
+        _repositoryMock.Setup(x => x.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(investmentProduct);
 
-        _contextMock.Setup(c => c.InvestmentProducts).ReturnsDbSet(_dbSetMock.Object);
-
-        _handler = new GetInvestmentProductByIdHandler(_contextMock.Object, _loggerMock.Object);
-    }
-
-    [Fact]
-    public async Task ShouldReturnInvestmentProduct_WhenProductExists()
-    {
-        // Arrange
         var query = new GetInvestmentProductByIdQuery { Id = 1 };
 
         // Act
@@ -66,6 +56,9 @@ public class GetInvestmentProductByIdTests
     {
         // Arrange
         var query = new GetInvestmentProductByIdQuery { Id = 999 };
+
+        _repositoryMock.Setup(x => x.GetByIdAsync(999, It.IsAny<CancellationToken>()))
+                       .ReturnsAsync((InvestmentProduct?)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<AppException>(() => _handler.Handle(query, CancellationToken.None));

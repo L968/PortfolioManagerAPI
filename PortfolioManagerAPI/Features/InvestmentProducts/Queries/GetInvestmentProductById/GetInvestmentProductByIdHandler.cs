@@ -1,19 +1,18 @@
-﻿using PortfolioManagerAPI.Infrastructure;
+﻿using PortfolioManagerAPI.Infrastructure.Repositories.Interfaces;
 
 namespace PortfolioManagerAPI.Features.InvestmentProducts.Queries.GetInvestmentProductById;
 
 internal sealed class GetInvestmentProductByIdHandler(
-    AppDbContext context,
+    IInvestmentProductRepository repository,
     ILogger<GetInvestmentProductByIdHandler> logger
     ) : IRequestHandler<GetInvestmentProductByIdQuery, GetInvestmentProductByIdResponse>
 {
-    private readonly AppDbContext _context = context;
+    private readonly IInvestmentProductRepository _repository = repository;
     private readonly ILogger<GetInvestmentProductByIdHandler> _logger = logger;
 
     public async Task<GetInvestmentProductByIdResponse> Handle(GetInvestmentProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var investmentProduct = await _context.InvestmentProducts
-            .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+        var investmentProduct = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
         if (investmentProduct is null)
         {

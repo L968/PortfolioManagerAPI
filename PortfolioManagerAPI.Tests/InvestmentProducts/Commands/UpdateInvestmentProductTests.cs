@@ -1,29 +1,30 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Moq.EntityFrameworkCore;
 using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Exceptions;
 using PortfolioManagerAPI.Features.InvestmentProducts.Commands.UpdateInvestmentProduct;
 using PortfolioManagerAPI.Infrastructure;
+using PortfolioManagerAPI.Infrastructure.Repositories.Interfaces;
 
 namespace PortfolioManagerAPI.Tests.InvestmentProducts.Commands;
 
 public class UpdateInvestmentProductTests
 {
-    private readonly Mock<AppDbContext> _contextMock;
+    private readonly Mock<IInvestmentProductRepository> _repositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IDistributedCache> _cacheMock;
     private readonly Mock<ILogger<UpdateInvestmentProductHandler>> _loggerMock;
     private readonly UpdateInvestmentProductHandler _handler;
 
     public UpdateInvestmentProductTests()
     {
-        _contextMock = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
+        _repositoryMock = new Mock<IInvestmentProductRepository>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
         _cacheMock = new Mock<IDistributedCache>();
         _loggerMock = new Mock<ILogger<UpdateInvestmentProductHandler>>();
 
-        _handler = new UpdateInvestmentProductHandler(_contextMock.Object, _cacheMock.Object, _loggerMock.Object);
+        _handler = new UpdateInvestmentProductHandler(_repositoryMock.Object, _unitOfWorkMock.Object, _cacheMock.Object, _loggerMock.Object);
     }
 
     [Fact]
@@ -48,15 +49,17 @@ public class UpdateInvestmentProductTests
             ExpirationDate = new DateTime(2026, 1, 1)
         };
 
-        _contextMock.Setup(x => x.InvestmentProducts)
-            .ReturnsDbSet([existingProduct]);
+        _repositoryMock.Setup(x => x.GetByIdAsync(command.Id, It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(existingProduct);
 
         // Act
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        _contextMock.Verify(x => x.InvestmentProducts.Update(It.IsAny<InvestmentProduct>()), Times.Once);
-        _contextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(x => x.Update(existingProduct), Times.Once);
+        _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _cacheMock.Verify(x => x.RemoveAsync(CacheKeys.InvestmentProducts, It.IsAny<CancellationToken>()), Times.Once);
+
         Assert.Equal("Updated Product", existingProduct.Name);
         Assert.Equal(InvestmentProductType.Fund, existingProduct.Type);
         Assert.Equal(150m, existingProduct.Price);
@@ -76,13 +79,14 @@ public class UpdateInvestmentProductTests
             ExpirationDate = new DateTime(2025, 1, 1)
         };
 
-        _contextMock.Setup(x => x.InvestmentProducts).ReturnsDbSet([]);
+        _repositoryMock.Setup(x => x.GetByIdAsync(command.Id, It.IsAny<CancellationToken>()))
+                       .ReturnsAsync((InvestmentProduct?)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<AppException>(() => _handler.Handle(command, CancellationToken.None));
         Assert.Equal($"No Investment Product found with Id {command.Id}", exception.Message);
 
-        _contextMock.Verify(x => x.InvestmentProducts.Update(It.IsAny<InvestmentProduct>()), Times.Never);
-        _contextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        _repositoryMock.Verify(x => x.Update(It.IsAny<InvestmentProduct>()), Times.Never);
+        _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }

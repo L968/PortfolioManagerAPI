@@ -1,29 +1,30 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Moq.EntityFrameworkCore;
 using PortfolioManagerAPI.Domain;
 using PortfolioManagerAPI.Exceptions;
 using PortfolioManagerAPI.Features.InvestmentProducts.Commands.DeleteInvestmentProduct;
 using PortfolioManagerAPI.Infrastructure;
+using PortfolioManagerAPI.Infrastructure.Repositories.Interfaces;
 
 namespace PortfolioManagerAPI.Tests.InvestmentProducts.Commands;
 
 public class DeleteInvestmentProductTests
 {
-    private readonly Mock<AppDbContext> _contextMock;
+    private readonly Mock<IInvestmentProductRepository> _repositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IDistributedCache> _cacheMock;
     private readonly Mock<ILogger<DeleteInvestmentProductHandler>> _loggerMock;
     private readonly DeleteInvestmentProductHandler _handler;
 
     public DeleteInvestmentProductTests()
     {
-        _contextMock = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
+        _repositoryMock = new Mock<IInvestmentProductRepository>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
         _cacheMock = new Mock<IDistributedCache>();
         _loggerMock = new Mock<ILogger<DeleteInvestmentProductHandler>>();
 
-        _handler = new DeleteInvestmentProductHandler(_contextMock.Object, _cacheMock.Object, _loggerMock.Object);
+        _handler = new DeleteInvestmentProductHandler(_repositoryMock.Object, _unitOfWorkMock.Object, _cacheMock.Object, _loggerMock.Object);
     }
 
     [Fact]
@@ -44,15 +45,16 @@ public class DeleteInvestmentProductTests
             Id = 1
         };
 
-        _contextMock.Setup(x => x.InvestmentProducts)
-            .ReturnsDbSet(new List<InvestmentProduct> { existingProduct });
+        _repositoryMock.Setup(x => x.GetByIdAsync(command.Id, It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(existingProduct);
 
         // Act
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        _contextMock.Verify(x => x.InvestmentProducts.Remove(It.IsAny<InvestmentProduct>()), Times.Once);
-        _contextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(x => x.Delete(existingProduct), Times.Once);
+        _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _cacheMock.Verify(x => x.RemoveAsync(CacheKeys.InvestmentProducts, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -64,13 +66,14 @@ public class DeleteInvestmentProductTests
             Id = 999
         };
 
-        _contextMock.Setup(x => x.InvestmentProducts).ReturnsDbSet(new List<InvestmentProduct>());
+        _repositoryMock.Setup(x => x.GetByIdAsync(command.Id, It.IsAny<CancellationToken>()))
+                       .ReturnsAsync((InvestmentProduct?)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<AppException>(() => _handler.Handle(command, CancellationToken.None));
         Assert.Equal($"No Investment Product found with Id {command.Id}", exception.Message);
 
-        _contextMock.Verify(x => x.InvestmentProducts.Remove(It.IsAny<InvestmentProduct>()), Times.Never);
-        _contextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        _repositoryMock.Verify(x => x.Delete(It.IsAny<InvestmentProduct>()), Times.Never);
+        _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }
