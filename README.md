@@ -1,6 +1,6 @@
 # Portfolio Manager API
 
-O sistema descrito a seguir foi desenvolvido como parte do teste de processo seletivo para a vaga de Engenheiro de Software para a empresa XP Investimentos.
+O sistema descrito a seguir foi desenvolvido como parte do teste de processo seletivo para a vaga de Engenheiro de Software III para a empresa XP Investimentos.
 
 # Como Rodar o Projeto
 
