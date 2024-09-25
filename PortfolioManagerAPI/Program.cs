@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using PortfolioManagerAPI.Behaviours;
 using PortfolioManagerAPI.Handlers;
 using PortfolioManagerAPI.Infrastructure;
+using PortfolioManagerAPI.Infrastructure.Repositories;
+using PortfolioManagerAPI.Infrastructure.Repositories.Interfaces;
 using PortfolioManagerAPI.Infrastructure.Services;
 using PortfolioManagerAPI.Jobs;
 using System.Globalization;
@@ -41,6 +43,10 @@ ValidatorOptions.Global.LanguageManager.Culture = CultureInfo.InvariantCulture;
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IInvestmentProductRepository, InvestmentProductRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IUserProductRepository, UserProductRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var connectionString = builder.Configuration.GetConnectionString("Database");
 var serverVersion = ServerVersion.AutoDetect(connectionString);
